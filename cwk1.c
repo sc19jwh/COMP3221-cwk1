@@ -66,11 +66,23 @@ void pushToStack( int newItem )
 // Removes an item from the stack but does not return the value.
 void popFromStack()
 {
+	int newSize = stackSize - 1;
+	#pragma omp atomic write
+	stackSize = newSize;
 }
 
 // Inverts the stack in-place; that is, the order of all elements is reversed.
 void invertStack()
 {
+	int temp;
+    int i, j;
+    #pragma omp parallel for
+    for (i = 0; i < stackSize/2; i++) {
+        j = stackSize-1-i;
+        temp = stack[i];
+        stack[i] = stack[j];
+        stack[j] = temp;
+    }
 }
 
 // Rotates the stack down to the given value.
@@ -109,9 +121,13 @@ int main( int argc, char** argv )
 	//
 	// 1. Add multiple items to the stack in a loop. This loop needs to be parallelised as part of the coursework.
 	//
+	#pragma omp parallel for
 	for( i=1; i<=initStackSize; i++ )
 	{
-		pushToStack( i * i );
+		#pragma omp critical
+		{
+			pushToStack( i * i );
+		}
 	}
 
 	// Display the initial stack. The argument '0' means this is the initial stack.
@@ -120,6 +136,7 @@ int main( int argc, char** argv )
 	//
 	// 2. Remove multiple items from the stack. This loop needs to be parallelised as part of the coursework.
 	//
+	#pragma omp parallel for
 	for( i=1; i<=numToPop; i++ )
 	{
 		popFromStack();
@@ -147,5 +164,3 @@ int main( int argc, char** argv )
 
 	return EXIT_SUCCESS;
 }
-
-
