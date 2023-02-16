@@ -107,7 +107,7 @@ void rotateStack( int depth )
     // sc19jwh - loop made parallel using omp parallel for
 	#pragma omp parallel for
 	for( i=0; i<depth-1; i++ )
-		stack[stackSize-depth+i] = stack[stackSize-depth+i+1];
+		stack[stackSize-depth+i] = tempStack[stackSize-depth+i+1];
 
 	stack[stackSize-1] = temp;
 }
