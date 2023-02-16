@@ -53,7 +53,7 @@
 // Push an item to the stack. Prints an error message if the stack limit has already been reached.
 void pushToStack( int newItem )
 {
-    // sc19jwh - Code remains to ensure that it is not assumed that assume initStackSize ≤ maxStackSize
+    // sc19jwh - Code remains to ensure that it is not assumed that initStackSize ≤ maxStackSize
 	if( stackSize==maxStackSize )
 	{
 		printf( "Cannot add to stack; already at its maximum size (of %i).\n", maxStackSize );
