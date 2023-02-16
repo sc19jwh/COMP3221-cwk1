@@ -53,12 +53,15 @@
 // Push an item to the stack. Prints an error message if the stack limit has already been reached.
 void pushToStack( int newItem )
 {
+    // sc19jwh - Code remains to ensure that it is not assumed that assume initStackSize ≤ maxStackSize
 	if( stackSize==maxStackSize )
 	{
 		printf( "Cannot add to stack; already at its maximum size (of %i).\n", maxStackSize );
 		return;
 	}
 
+	// sc19jwh - Critical region used given data dependencies, enclosed using #pragma omp critical
+	// sc19jwh - used instead of atomic as there is more than one update operation (stackSize++ & newItem added)
 	#pragma omp critical
 	{
 		// Add the 'item' (i.e. the integer value) to the top of the stack, and also increment the stack size.
@@ -69,7 +72,8 @@ void pushToStack( int newItem )
 // Removes an item from the stack but does not return the value.
 void popFromStack()
 {
-	#pragma omp atomic
+    // sc19jwh - atomic used given one a single update operation and thus more efficient in this context
+    #pragma omp atomic
 	stackSize--;
 }
 
@@ -77,12 +81,12 @@ void popFromStack()
 void invertStack()
 {
 	int i, temp;
-	// Parallel for loop through half of the stack
+	// sc19jwh - Parallel for loop through half of the stack
     #pragma omp parallel for
     for (i = 0; i < stackSize / 2; i++) {
-		// Capture current element in temp variable
+		// sc19jwh - Capture current element in temp variable
         temp = stack[i];
-		// Set i'th from top value to i'th from bottom value and vice versa
+		// sc19jwh - Set i'th from top value to i'th from bottom value and vice versa
         stack[i] = stack[stackSize - 1 - i];
         stack[stackSize - 1 - i] = temp;
     }
@@ -93,6 +97,7 @@ void rotateStack( int depth )
 {
 	int i, temp = stack[stackSize-depth];
 
+    // sc19jwh - loop made parallel using omp parallel for
 	#pragma omp parallel for
 	for( i=0; i<depth-1; i++ )
 		stack[stackSize-depth+i] = stack[stackSize-depth+i+1];
@@ -125,7 +130,8 @@ int main( int argc, char** argv )
 	//
 	// 1. Add multiple items to the stack in a loop. This loop needs to be parallelised as part of the coursework.
 	//
-	#pragma omp parallel for
+    // sc19jwh - loop made parallel using omp parallel for
+    #pragma omp parallel for
 	for( i=1; i<=initStackSize; i++ )
 	{
 		pushToStack( i * i );
@@ -137,7 +143,8 @@ int main( int argc, char** argv )
 	//
 	// 2. Remove multiple items from the stack. This loop needs to be parallelised as part of the coursework.
 	//
-	#pragma omp parallel for
+    // sc19jwh - loop made parallel using omp parallel for
+    #pragma omp parallel for
 	for( i=1; i<=numToPop; i++ )
 	{
 		popFromStack();
@@ -165,3 +172,5 @@ int main( int argc, char** argv )
 
 	return EXIT_SUCCESS;
 }
+
+
