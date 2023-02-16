@@ -72,8 +72,9 @@ void pushToStack( int newItem )
 // Removes an item from the stack but does not return the value.
 void popFromStack()
 {
-    // sc19jwh - atomic used given one a single update operation and thus more efficient in this context
+    // sc19jwh - atomic used given one single update operation and thus more efficient in this context
     #pragma omp atomic
+	// sc19jwh - decrement stackSize to remove top element from stack (last element - LIFO)
 	stackSize--;
 }
 
@@ -96,11 +97,17 @@ void invertStack()
 void rotateStack( int depth )
 {
 	int i, temp = stack[stackSize-depth];
+	// sc19jwh - initialize a temp stack to avoid race conditions
+	int* tempStack = (int*) malloc( sizeof(int) * stackSize );
+	// sc19jwh - copy contents of stack into tempstack
+	#pragma omp parallel for
+	for( i=0; i<stackSize; i++ )
+		tempStack[i] = stack[i];
 
     // sc19jwh - loop made parallel using omp parallel for
 	#pragma omp parallel for
-	for( i=0; i<depth-1; i++ )
-		stack[stackSize-depth+i] = stack[stackSize-depth+i+1];
+	for (i = 0; i < depth - 1; i++)
+		stack[stackSize - depth + i] = tempStack[stackSize - depth + i + 1];
 
 	stack[stackSize-1] = temp;
 }
