@@ -61,7 +61,7 @@ void pushToStack( int newItem )
 	}
 
 	// sc19jwh - Critical region used given data dependencies, enclosed using #pragma omp critical
-	// sc19jwh - used instead of atomic as there is more than one update operation (stackSize++ & newItem added)
+	// sc19jwh - used instead of atomic as there is more than one update operation
 	#pragma omp critical
 	{
 		// Add the 'item' (i.e. the integer value) to the top of the stack, and also increment the stack size.
@@ -73,8 +73,8 @@ void pushToStack( int newItem )
 void popFromStack()
 {
     // sc19jwh - atomic used given it is one single update operation and thus more efficient in this context
-    #pragma omp atomic
 	// sc19jwh - decrement stackSize to remove top element from stack (last element - LIFO)
+	#pragma omp atomic
 	stackSize--;
 }
 
@@ -83,11 +83,12 @@ void invertStack()
 {
 	int i, temp;
 	// sc19jwh - Parallel for loop through half of the stack
-    #pragma omp parallel for
+	// sc19jwh - Private temp variable used so that each thread has its own copy of the variable
+    #pragma omp parallel for private (temp)
     for (i = 0; i < stackSize / 2; i++) {
 		// sc19jwh - Capture current element in temp variable
         temp = stack[i];
-		// sc19jwh - Set i'th from top value to i'th from bottom value and vice versa
+		// sc19jwh - Set i'th from bottom value to i'th from top value and vice versa
         stack[i] = stack[stackSize - 1 - i];
         stack[stackSize - 1 - i] = temp;
     }
