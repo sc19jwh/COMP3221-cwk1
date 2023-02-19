@@ -99,7 +99,7 @@ void rotateStack( int depth )
 {
 	int i, temp = stack[stackSize-depth];
 	// sc19jwh - initialize a temp stack to avoid race conditions
-	int* tempStack = (int*) malloc( sizeof(int) * stackSize );
+	int* tempStack = (int*) malloc( sizeof(int) * maxStackSize );
 	// sc19jwh - copy contents of stack into tempstack
 	#pragma omp parallel for
 	for( i=0; i<stackSize; i++ )
