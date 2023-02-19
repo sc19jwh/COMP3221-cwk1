@@ -111,6 +111,9 @@ void rotateStack( int depth )
 		stack[stackSize-depth+i] = tempStack[stackSize-depth+i+1];
 
 	stack[stackSize-1] = temp;
+
+	// sc19jwh - free temp stack memory
+	free( tempStack );
 }
 
 //
