@@ -109,6 +109,18 @@ void rotateStack( int depth )
 	free( tempStack );
 }
 
+// sc19jwh - additional function added to ensure if trying to initialize a stack to big, maxStackSize is used instead
+// sc19jwh - print out warning statement when maxStackSize is forced to be used as stackSize
+int findmin(int initStackSize, int maxStackSize)
+{
+	if (initStackSize > maxStackSize){
+		printf( "Cannot create stack of size %i; initStackSize exceeds maxStackSize (of %i).\n", initStackSize, maxStackSize );
+		printf( "stackSize has been set to maxStackSize (of %i).\n", maxStackSize );
+		return maxStackSize;
+	}
+	return initStackSize;
+}
+
 //
 // Main
 //
@@ -134,22 +146,13 @@ int main( int argc, char** argv )
 	//
 	// 1. Add multiple items to the stack in a loop. This loop needs to be parallelised as part of the coursework.
 	//
-    // sc19jwh - loop made parallel using omp parallel for
-	if (initStackSize > maxStackSize) {
-		printf( "Cannot create stack of size; initStackSize (of %i) exceeds maxStackSize (of %i).\n", initStackSize, maxStackSize );
-		printf( "stackSize has been set to maxStackSize (%i).\n", maxStackSize );
-		#pragma omp parallel for
-		for( i=1; i<=maxStackSize; i++ )
-		{
-			pushToStack( i * i );
-		}
-	}
-	else {
-		#pragma omp parallel for
-		for( i=1; i<=initStackSize; i++ )
-		{
-			pushToStack( i * i );
-		}
+    // sc19jwh - find min to ensure stackSize does not exceed the maximum. Value used in corresponding for loop.
+	int safeStackSize = findmin(initStackSize, maxStackSize);
+	// sc19jwh - loop made parallel using omp parallel for
+	#pragma omp parallel for
+	for( i=1; i<=safeStackSize; i++ )
+	{
+		pushToStack( i * i );
 	}
 
 	// Display the initial stack. The argument '0' means this is the initial stack.
