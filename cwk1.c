@@ -53,13 +53,6 @@
 // Push an item to the stack. Prints an error message if the stack limit has already been reached.
 void pushToStack( int newItem )
 {
-    // sc19jwh - Code remains to ensure that it is not assumed that initStackSize ≤ maxStackSize
-	if( stackSize==maxStackSize )
-	{
-		printf( "Cannot add to stack; already at its maximum size (of %i).\n", maxStackSize );
-		return;
-	}
-
 	// sc19jwh - Critical region used given data dependencies, enclosed using #pragma omp critical
 	// sc19jwh - used instead of atomic as there is more than one update operation
 	#pragma omp critical
@@ -142,10 +135,21 @@ int main( int argc, char** argv )
 	// 1. Add multiple items to the stack in a loop. This loop needs to be parallelised as part of the coursework.
 	//
     // sc19jwh - loop made parallel using omp parallel for
-    #pragma omp parallel for
-	for( i=1; i<=initStackSize; i++ )
-	{
-		pushToStack( i * i );
+	if (initStackSize > maxStackSize) {
+		printf( "Cannot create stack of size; initStackSize (of %i) exceeds maxStackSize (of %i).\n", initStackSize, maxStackSize );
+		printf( "stackSize has been set to maxStackSize (%i).\n", maxStackSize );
+		#pragma omp parallel for
+		for( i=1; i<=maxStackSize; i++ )
+		{
+			pushToStack( i * i );
+		}
+	}
+	else {
+		#pragma omp parallel for
+		for( i=1; i<=initStackSize; i++ )
+		{
+			pushToStack( i * i );
+		}
 	}
 
 	// Display the initial stack. The argument '0' means this is the initial stack.
@@ -183,5 +187,4 @@ int main( int argc, char** argv )
 
 	return EXIT_SUCCESS;
 }
-
 
