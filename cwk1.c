@@ -148,6 +148,7 @@ int main( int argc, char** argv )
 	// 1. Add multiple items to the stack in a loop. This loop needs to be parallelised as part of the coursework.
 	//
     // sc19jwh - find min to ensure stackSize does not exceed the maximum. Value used in corresponding for loop.
+	// sc19jwh - not checking this results in segfaults
 	int safeStackSize = findmin(initStackSize, maxStackSize);
 	// sc19jwh - loop made parallel using omp parallel for
 	#pragma omp parallel for
