@@ -77,14 +77,14 @@ void invertStack()
 	int i, temp;
 	// sc19jwh - Parallel for loop through half of the stack
 	// sc19jwh - Private temp variable used so that each thread has its own copy of the variable
-    #pragma omp parallel for private (temp)
-    for (i = 0; i < stackSize / 2; i++) {
+	#pragma omp parallel for private (temp)
+	for (i = 0; i < stackSize / 2; i++) {
 		// sc19jwh - Capture current element in temp variable
-        temp = stack[i];
+		temp = stack[i];
 		// sc19jwh - Set i'th from bottom value to i'th from top value and vice versa
-        stack[i] = stack[stackSize - 1 - i];
-        stack[stackSize - 1 - i] = temp;
-    }
+		stack[i] = stack[stackSize - 1 - i];
+		stack[stackSize - 1 - i] = temp;
+	}
 }
 
 // Rotates the stack down to the given value.
@@ -98,7 +98,7 @@ void rotateStack( int depth )
 	for( i=0; i<stackSize; i++ )
 		tempStack[i] = stack[i];
 
-    // sc19jwh - loop made parallel using omp parallel for
+	// sc19jwh - loop made parallel using omp parallel for
 	#pragma omp parallel for
 	for( i=0; i<depth-1; i++ )
 		stack[stackSize-depth+i] = tempStack[stackSize-depth+i+1];
@@ -110,14 +110,15 @@ void rotateStack( int depth )
 }
 
 // sc19jwh - additional function added to ensure if trying to initialize a stack to big, maxStackSize is used instead
-// sc19jwh - print out warning statement when maxStackSize is forced to be used as stackSize
 int findmin(int initStackSize, int maxStackSize)
 {
 	if (initStackSize > maxStackSize){
+		// sc19jwh - print out warning statement when maxStackSize is forced to be used as stackSize
 		printf( "Cannot create stack of size %i; initStackSize exceeds maxStackSize (of %i).\n", initStackSize, maxStackSize );
 		printf( "stackSize has been set to maxStackSize (of %i).\n", maxStackSize );
 		return maxStackSize;
 	}
+	// sc19jwh - otherwise return initStackSize as less than maxStackSize
 	return initStackSize;
 }
 
